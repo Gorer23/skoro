@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4efe7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Diction Lab">
+  <meta name="description" content="Diction Lab — тренажёр дикции со скороговорками, таймером и записью голоса.">
+  <title>Diction Lab</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">DL</div>
+        <div><strong>DICTION LAB</strong><span>тренажёр дикции</span></div>
+      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Настройки">⚙</button>
+    </header>
+
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <span class="badge">ГОЛОС • ДИКЦИЯ • ТЕМП</span>
+        <h1>Говори чётче.<br>Слушай себя.<br><em>Повторяй лучше.</em></h1>
+        <p>Короткие тренировки со скороговорками. Приложение само записывает попытку, после чего ты можешь сразу её прослушать.</p>
+        <button class="primary big" id="startDaily">Начать тренировку</button>
+      </div>
+
+      <section class="mode-grid">
+        <button class="mode-card selected" data-mode="daily">
+          <span class="mode-num">01</span><strong>Ежедневная</strong><small>≈ 10 минут • полный цикл</small>
+        </button>
+        <button class="mode-card" data-mode="clarity">
+          <span class="mode-num">02</span><strong>Чёткость</strong><small>≈ 7 минут • медленно и чисто</small>
+        </button>
+        <button class="mode-card" data-mode="speed">
+          <span class="mode-num">03</span><strong>Скорость</strong><small>≈ 6 минут • темп без каши</small>
+        </button>
+      </section>
+
+      <section class="stats-row">
+        <article><span>Тренировок</span><strong id="statSessions">0</strong></article>
+        <article><span>Минут</span><strong id="statMinutes">0</strong></article>
+        <article><span>Серия</span><strong id="statStreak">0</strong></article>
+      </section>
+
+      <section class="feature-strip">
+        <div><b>Автозапись</b><span>Стартует вместе с попыткой</span></div>
+        <div><b>Локально</b><span>Голос не отправляется в интернет</span></div>
+        <div><b>Без повторов</b><span>Пройденные фразы уходят из текущего круга</span></div>
+      </section>
+    </section>
+
+    <section id="trainView" class="view">
+      <div class="session-head">
+        <button class="text-btn" id="exitBtn">← Выйти</button>
+        <div class="session-meta"><span id="sessionLabel">Ежедневная</span><b id="stepLabel">1 / 8</b></div>
+      </div>
+
+      <div class="progress"><div id="progressBar"></div></div>
+
+      <section class="exercise-card">
+        <div class="exercise-top">
+          <div><span class="eyebrow" id="phaseLabel">РАЗМИНКА</span><h2 id="instruction">Произнеси медленно и чётко</h2></div>
+          <div class="timer" id="timer">00:30</div>
+        </div>
+
+        <div class="phrase-wrap">
+          <div class="sound-tag" id="soundTag">Р / Л</div>
+          <div class="phrase" id="phraseText">Рыжий Рома ровно режет рулет.</div>
+          <div class="difficulty" id="difficulty">●○○</div>
+        </div>
+
+        <div class="tempo-row">
+          <span>Темп</span>
+          <div class="tempo-track"><div id="tempoFill"></div></div>
+          <b id="tempoText">медленно</b>
+        </div>
+
+        <div class="rec-panel" id="recPanel">
+          <div class="rec-status"><span class="rec-dot" id="recDot"></span><b id="recText">Микрофон ещё не включён</b></div>
+          <div class="level-bars" id="levelBars" aria-hidden="true"></div>
+        </div>
+
+        <div class="countdown hidden" id="countdown">3</div>
+
+        <div class="train-actions">
+          <button class="primary" id="recordBtn">Начать попытку</button>
+          <button class="secondary hidden" id="pauseBtn">Пауза</button>
+          <button class="secondary hidden" id="newPhraseBtn">Другая скороговорка</button>
+        </div>
+      </section>
+
+      <section class="review-card hidden" id="reviewCard">
+        <div class="review-head"><span class="eyebrow">ПРОСЛУШАЙ СЕБЯ</span><span id="takeDuration">0:00</span></div>
+        <audio id="audioPlayer" controls preload="metadata"></audio>
+        <div class="self-check">
+          <span>Как прозвучало?</span>
+          <div class="rating-row">
+            <button data-rating="retry">Повторить</button>
+            <button data-rating="ok">Нормально</button>
+            <button data-rating="good">Чисто</button>
+          </div>
+        </div>
+        <button class="primary" id="nextBtn">Следующая попытка →</button>
+      </section>
+    </section>
+
+    <section id="historyView" class="view">
+      <div class="section-title"><div><span class="eyebrow">ЛОКАЛЬНЫЙ АРХИВ</span><h2>Последние записи</h2></div><button class="text-btn" id="backFromHistory">Назад</button></div>
+      <div id="recordingsList" class="recordings-list"></div>
+    </section>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-view="homeView">Тренировка</button>
+      <button class="nav-btn" data-view="historyView">Записи</button>
+    </nav>
+  </main>
+
+  <div class="modal hidden" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-head"><div><span class="eyebrow">НАСТРОЙКИ</span><h2>Тренировка</h2></div><button class="icon-btn" id="closeSettings">×</button></div>
+      <label class="setting"><span><b>Звуковой сигнал</b><small>Перед стартом и в конце</small></span><input type="checkbox" id="soundToggle" checked></label>
+      <label class="setting"><span><b>Хранить записи</b><small>До 20 последних на этом устройстве</small></span><input type="checkbox" id="saveRecordings" checked></label>
+      <label class="setting"><span><b>Не повторять пройденное</b><small>До завершения текущего круга</small></span><input type="checkbox" id="noRepeat" checked></label>
+      <button class="danger-link" id="resetSeen">Сбросить пройденные скороговорки</button>
+      <p class="privacy-note">Микрофон включается только после твоего нажатия. Записи остаются в браузере устройства и никуда не загружаются.</p>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
